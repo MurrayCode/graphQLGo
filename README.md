@@ -1,4 +1,4 @@
-Simple GraphQL Go example of a Watch Store
+Simple GraphQL,Go and MongoDB example of a Watch Store
 
 Mutation example for creating a Watch:
 ![Adding Watches](images/AddWatch.png)
