@@ -1,0 +1,25 @@
+type Watch {
+  _id: String!
+  name: String!
+  brand: String!
+  price: Int
+  stock: Int!
+  inStock: Boolean!
+}
+
+type Query {
+  watch(_id: String!): Watch!
+  watches: [Watch!]!
+}
+
+input NewWatch {
+  name: String!
+  brand: String!
+  price: Int
+  stock: Int!
+  inStock: Boolean!
+}
+
+type Mutation {
+  createWatch(input: NewWatch): Watch!
+}
