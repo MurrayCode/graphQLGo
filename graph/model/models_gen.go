@@ -11,7 +11,7 @@ type NewWatch struct {
 }
 
 type Watch struct {
-	ID      string `json:"_id"`
+	ID      string `json:"_id" bson:"_id"`
 	Name    string `json:"name"`
 	Brand   string `json:"brand"`
 	Price   *int   `json:"price"`
