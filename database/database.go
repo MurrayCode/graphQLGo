@@ -50,6 +50,20 @@ func (db *DB) Save(input *model.NewWatch) *model.Watch {
 	}
 }
 
+func (db *DB) Delete(ID string) *model.Watch {
+	ObjectID, err := primitive.ObjectIDFromHex(ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	collection := db.client.Database("watchstore").Collection("watches")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	res := collection.FindOneAndDelete(ctx, bson.M{"_id": ObjectID})
+	watch := model.Watch{}
+	res.Decode(&watch)
+	return &watch
+}
+
 func (db *DB) FindByID(ID string) *model.Watch {
 	ObjectID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
@@ -59,9 +73,9 @@ func (db *DB) FindByID(ID string) *model.Watch {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	res := collection.FindOne(ctx, bson.M{"_id": ObjectID})
-	dog := model.Watch{}
-	res.Decode(&dog)
-	return &dog
+	watch := model.Watch{}
+	res.Decode(&watch)
+	return &watch
 }
 
 func (db *DB) All() []*model.Watch {

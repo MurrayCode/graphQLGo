@@ -22,4 +22,8 @@ input NewWatch {
 
 type Mutation {
   createWatch(input: NewWatch): Watch!
+  updateWatch(_id: String!, changes: Map!): Watch
+  deleteWatch(_id: String!): Watch!
 }
+
+scalar Map

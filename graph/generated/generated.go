@@ -45,6 +45,8 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Mutation struct {
 		CreateWatch func(childComplexity int, input *model.NewWatch) int
+		DeleteWatch func(childComplexity int, id string) int
+		UpdateWatch func(childComplexity int, id string, changes map[string]interface{}) int
 	}
 
 	Query struct {
@@ -64,6 +66,8 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateWatch(ctx context.Context, input *model.NewWatch) (*model.Watch, error)
+	UpdateWatch(ctx context.Context, id string, changes map[string]interface{}) (*model.Watch, error)
+	DeleteWatch(ctx context.Context, id string) (*model.Watch, error)
 }
 type QueryResolver interface {
 	Watch(ctx context.Context, id string) (*model.Watch, error)
@@ -96,6 +100,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateWatch(childComplexity, args["input"].(*model.NewWatch)), true
+
+	case "Mutation.deleteWatch":
+		if e.complexity.Mutation.DeleteWatch == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteWatch_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteWatch(childComplexity, args["_id"].(string)), true
+
+	case "Mutation.updateWatch":
+		if e.complexity.Mutation.UpdateWatch == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateWatch_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateWatch(childComplexity, args["_id"].(string), args["changes"].(map[string]interface{})), true
 
 	case "Query.watch":
 		if e.complexity.Query.Watch == nil {
@@ -246,7 +274,11 @@ input NewWatch {
 
 type Mutation {
   createWatch(input: NewWatch): Watch!
-}`, BuiltIn: false},
+  updateWatch(_id: String!, changes: Map!): Watch
+  deleteWatch(_id: String!): Watch!
+}
+
+scalar Map`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -266,6 +298,45 @@ func (ec *executionContext) field_Mutation_createWatch_args(ctx context.Context,
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteWatch_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["_id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["_id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateWatch_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["_id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["_id"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["changes"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("changes"))
+		arg1, err = ec.unmarshalNMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["changes"] = arg1
 	return args, nil
 }
 
@@ -363,6 +434,87 @@ func (ec *executionContext) _Mutation_createWatch(ctx context.Context, field gra
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateWatch(rctx, args["input"].(*model.NewWatch))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Watch)
+	fc.Result = res
+	return ec.marshalNWatch2ᚖgithubᚗcomᚋMurrayCodeᚋgraphQLGoᚋgraphᚋmodelᚐWatch(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateWatch(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateWatch_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateWatch(rctx, args["_id"].(string), args["changes"].(map[string]interface{}))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Watch)
+	fc.Result = res
+	return ec.marshalOWatch2ᚖgithubᚗcomᚋMurrayCodeᚋgraphQLGoᚋgraphᚋmodelᚐWatch(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteWatch(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteWatch_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteWatch(rctx, args["_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1939,6 +2091,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateWatch":
+			out.Values[i] = ec._Mutation_updateWatch(ctx, field)
+		case "deleteWatch":
+			out.Values[i] = ec._Mutation_deleteWatch(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2329,6 +2488,27 @@ func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}
 
 func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
 	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNMap2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
+	res, err := graphql.UnmarshalMap(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNMap2map(ctx context.Context, sel ast.SelectionSet, v map[string]interface{}) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := graphql.MarshalMap(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2736,6 +2916,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) marshalOWatch2ᚖgithubᚗcomᚋMurrayCodeᚋgraphQLGoᚋgraphᚋmodelᚐWatch(ctx context.Context, sel ast.SelectionSet, v *model.Watch) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Watch(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
