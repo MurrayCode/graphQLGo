@@ -92,11 +92,11 @@ func (db *DB) Update(ID string, input *model.UpdateWatch) *model.Watch {
 	defer cancel()
 	update := bson.D{{"$set",
 		bson.D{
-			{"name", input.Name},
-			{"brand", input.Brand},
-			{"price", input.Price},
-			{"stock", input.Stock},
-			{"inStock", input.InStock},
+			{Key: "name", Value: input.Name},
+			{Key: "brand", Value: input.Brand},
+			{Key: "price", Value: input.Price},
+			{Key: "stock", Value: input.Stock},
+			{Key: "inStock", Value: input.InStock},
 		}}}
 	res := collection.FindOneAndUpdate(ctx, bson.M{"_id": ObjectID}, update)
 	watch := model.Watch{}
