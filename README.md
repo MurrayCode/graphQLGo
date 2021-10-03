@@ -1,13 +1,16 @@
 Simple GraphQL,Go and MongoDB example of a Watch Store
 
-Mutation example for creating a Watch:
+Mutation example for creating a watch:
 ![Adding Watches](images/AddWatch.png)
 
-Query Example for getting All Watches
+Query example for getting ell watches
 ![Getting All Watches](images/AllWatches.png)
 
-Query Example for fetching watch by ID
+Query example for fetching watch by ID
 ![Get Watch By ID](images/GetWatch.png)
 
-Query Example for deleting watch by ID
+Mutation example for deleting watch by ID
 ![Deleting Watch By ID](images/DeleteWatch.png)
+
+Mutation example for updating a watch by ID
+![Deleting Watch By ID](images/UpdateByID.png)
