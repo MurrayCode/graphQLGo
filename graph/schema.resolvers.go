@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/MurrayCode/graphQLGo/database"
 	"github.com/MurrayCode/graphQLGo/graph/generated"
@@ -16,8 +15,8 @@ func (r *mutationResolver) CreateWatch(ctx context.Context, input *model.NewWatc
 	return db.Save(input), nil
 }
 
-func (r *mutationResolver) UpdateWatch(ctx context.Context, id string, changes map[string]interface{}) (*model.Watch, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) UpdateWatch(ctx context.Context, id string, input *model.UpdateWatch) (*model.Watch, error) {
+	return db.Update(id, input), nil
 }
 
 func (r *mutationResolver) DeleteWatch(ctx context.Context, id string) (*model.Watch, error) {

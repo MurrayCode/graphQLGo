@@ -46,7 +46,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateWatch func(childComplexity int, input *model.NewWatch) int
 		DeleteWatch func(childComplexity int, id string) int
-		UpdateWatch func(childComplexity int, id string, changes map[string]interface{}) int
+		UpdateWatch func(childComplexity int, id string, input *model.UpdateWatch) int
 	}
 
 	Query struct {
@@ -66,7 +66,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateWatch(ctx context.Context, input *model.NewWatch) (*model.Watch, error)
-	UpdateWatch(ctx context.Context, id string, changes map[string]interface{}) (*model.Watch, error)
+	UpdateWatch(ctx context.Context, id string, input *model.UpdateWatch) (*model.Watch, error)
 	DeleteWatch(ctx context.Context, id string) (*model.Watch, error)
 }
 type QueryResolver interface {
@@ -123,7 +123,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateWatch(childComplexity, args["_id"].(string), args["changes"].(map[string]interface{})), true
+		return e.complexity.Mutation.UpdateWatch(childComplexity, args["_id"].(string), args["input"].(*model.UpdateWatch)), true
 
 	case "Query.watch":
 		if e.complexity.Query.Watch == nil {
@@ -272,9 +272,17 @@ input NewWatch {
   inStock: Boolean!
 }
 
+input UpdateWatch {
+  name: String
+  brand: String
+  price: Int
+  stock: Int
+  inStock: Boolean
+}
+
 type Mutation {
   createWatch(input: NewWatch): Watch!
-  updateWatch(_id: String!, changes: Map!): Watch
+  updateWatch(_id: String!, input: UpdateWatch): Watch
   deleteWatch(_id: String!): Watch!
 }
 
@@ -328,15 +336,15 @@ func (ec *executionContext) field_Mutation_updateWatch_args(ctx context.Context,
 		}
 	}
 	args["_id"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["changes"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("changes"))
-		arg1, err = ec.unmarshalNMap2map(ctx, tmp)
+	var arg1 *model.UpdateWatch
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalOUpdateWatch2ᚖgithubᚗcomᚋMurrayCodeᚋgraphQLGoᚋgraphᚋmodelᚐUpdateWatch(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["changes"] = arg1
+	args["input"] = arg1
 	return args, nil
 }
 
@@ -475,7 +483,7 @@ func (ec *executionContext) _Mutation_updateWatch(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateWatch(rctx, args["_id"].(string), args["changes"].(map[string]interface{}))
+		return ec.resolvers.Mutation().UpdateWatch(rctx, args["_id"].(string), args["input"].(*model.UpdateWatch))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2063,6 +2071,61 @@ func (ec *executionContext) unmarshalInputNewWatch(ctx context.Context, obj inte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateWatch(ctx context.Context, obj interface{}) (model.UpdateWatch, error) {
+	var it model.UpdateWatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "brand":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("brand"))
+			it.Brand, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "price":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+			it.Price, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "stock":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stock"))
+			it.Stock, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "inStock":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inStock"))
+			it.InStock, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2496,27 +2559,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNMap2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
-	res, err := graphql.UnmarshalMap(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNMap2map(ctx context.Context, sel ast.SelectionSet, v map[string]interface{}) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := graphql.MarshalMap(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
-}
-
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2916,6 +2958,14 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) unmarshalOUpdateWatch2ᚖgithubᚗcomᚋMurrayCodeᚋgraphQLGoᚋgraphᚋmodelᚐUpdateWatch(ctx context.Context, v interface{}) (*model.UpdateWatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUpdateWatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOWatch2ᚖgithubᚗcomᚋMurrayCodeᚋgraphQLGoᚋgraphᚋmodelᚐWatch(ctx context.Context, sel ast.SelectionSet, v *model.Watch) graphql.Marshaler {

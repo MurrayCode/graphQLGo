@@ -32,6 +32,7 @@ func Connect() *DB {
 	}
 }
 
+//Add New Watch
 func (db *DB) Save(input *model.NewWatch) *model.Watch {
 	collection := db.client.Database("watchstore").Collection("watches")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -50,6 +51,7 @@ func (db *DB) Save(input *model.NewWatch) *model.Watch {
 	}
 }
 
+//Delete Watch by ID
 func (db *DB) Delete(ID string) *model.Watch {
 	ObjectID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
@@ -64,6 +66,7 @@ func (db *DB) Delete(ID string) *model.Watch {
 	return &watch
 }
 
+//Find Watch by ID
 func (db *DB) FindByID(ID string) *model.Watch {
 	ObjectID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
@@ -78,6 +81,30 @@ func (db *DB) FindByID(ID string) *model.Watch {
 	return &watch
 }
 
+//Update Watch by ID
+func (db *DB) Update(ID string, input *model.UpdateWatch) *model.Watch {
+	ObjectID, err := primitive.ObjectIDFromHex(ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	collection := db.client.Database("watchstore").Collection("watches")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	update := bson.D{{"$set",
+		bson.D{
+			{"name", input.Name},
+			{"brand", input.Brand},
+			{"price", input.Price},
+			{"stock", input.Stock},
+			{"inStock", input.InStock},
+		}}}
+	res := collection.FindOneAndUpdate(ctx, bson.M{"_id": ObjectID}, update)
+	watch := model.Watch{}
+	res.Decode(&watch)
+	return &watch
+}
+
+//Get All Watches
 func (db *DB) All() []*model.Watch {
 	collection := db.client.Database("watchstore").Collection("watches")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

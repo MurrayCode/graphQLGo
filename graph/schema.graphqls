@@ -20,9 +20,17 @@ input NewWatch {
   inStock: Boolean!
 }
 
+input UpdateWatch {
+  name: String
+  brand: String
+  price: Int
+  stock: Int
+  inStock: Boolean
+}
+
 type Mutation {
   createWatch(input: NewWatch): Watch!
-  updateWatch(_id: String!, changes: Map!): Watch
+  updateWatch(_id: String!, input: UpdateWatch): Watch
   deleteWatch(_id: String!): Watch!
 }
 

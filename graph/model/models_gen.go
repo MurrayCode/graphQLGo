@@ -10,6 +10,14 @@ type NewWatch struct {
 	InStock bool   `json:"inStock"`
 }
 
+type UpdateWatch struct {
+	Name    *string `json:"name"`
+	Brand   *string `json:"brand"`
+	Price   *int    `json:"price"`
+	Stock   *int    `json:"stock"`
+	InStock *bool   `json:"inStock"`
+}
+
 type Watch struct {
 	ID      string `json:"_id" bson:"_id"`
 	Name    string `json:"name"`
