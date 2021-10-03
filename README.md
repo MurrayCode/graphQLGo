@@ -8,3 +8,6 @@ Query Example for getting All Watches
 
 Query Example for fetching watch by ID
 ![Get Watch By ID](images/GetWatch.png)
+
+Query Example for deleting watch by ID
+![Deleting Watch By ID](images/DeleteWatch.png)
